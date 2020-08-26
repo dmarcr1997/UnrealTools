@@ -19,8 +19,17 @@ class CPPTOOLAUTO_API UMyAssetActionUtility : public UAssetActionUtility
 
 public:
 	UFUNCTION(CallInEditor)
-		void RenameSelectedAssets(FString SearchPattern, FString ReplacePattern, ESearchCase::Type SearchCase);
+	void RenameSelectedAssets(FString SearchPattern, FString ReplacePattern, ESearchCase::Type SearchCase);
+	
+	/// <summary>
+	/// Checks if a texture's dimensions are a power of two
+	/// </summary>
+	UFUNCTION(CallInEditor)
+		void CheckPowerOfTwo();
 private:
+	//return 1 is number is a power of 2
+	bool IsPowerOfTwo(int32 NumberToCheck);
+
 	/*
 		Prints a message to the screen
 	*/
