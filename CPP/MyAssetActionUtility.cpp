@@ -78,7 +78,37 @@ void UMyAssetActionUtility::CheckPowerOfTwo()
 
 #pragma endregion
 
+#pragma region addprefixs 
+void UMyAssetActionUtility::AddPrefixes()
+{
+	TArray<UObject*> SelectedObjects = UEditorUtilityLibrary::GetSelectedAssets();
+	uint32 Counter = 0;
 
+	for (UObject* SelectedObject : SelectedObjects)
+	{
+		if (ensure(SelectedObject))
+		{
+			const FString* Prefix = PrefixMap.Find(SelectedObject->GetClass());
+			if (ensure(Prefix) && !Prefix->Equals(""))
+			{
+				FString OldName = SelectedObject->GetName();
+				if (!OldName.StartsWith(*Prefix))
+				{
+					FString NewName = *Prefix + OldName;
+					UEditorUtilityLibrary::RenameAsset(SelectedObject, NewName);
+					Counter++;
+				}
+			}
+			else
+			{
+				PrintToScreen("Couldn't find prefix for class " + SelectedObject->GetClass()->GetName(), FColor::Red);
+			}
+		}
+	}
+	GiveFeedback("Added Prefix to", Counter);
+}
+
+#pragma endregion
 #pragma region Helper
 
 bool UMyAssetActionUtility::IsPowerOfTwo(int32 NumberToCheck)
@@ -88,3 +118,26 @@ bool UMyAssetActionUtility::IsPowerOfTwo(int32 NumberToCheck)
 	}
 	return (NumberToCheck & (NumberToCheck - 1)) == 0;
 }
+
+void UMyAssetActionUtility::PrintToScreen(FString Message, FColor Color)
+{
+	if (ensure(GEngine)) {
+		GEngine->AddOnScreenDebugMessage(-1, 2.5f, Color, Message);
+	}
+}
+
+
+void UMyAssetActionUtility::GiveFeedback(FString Method, uint32 Counter)
+{
+	FString Message = FString("No matching files found");
+	FColor Color = Counter > 0 ? FColor::Green : FColor::Red;
+
+	if (Counter > 0)
+	{
+		Message = Method.AppendChar(' ');
+		Message.AppendInt(Counter);
+		Message.Append(Counter == 1 ? TEXT(" file") : TEXT(" files"));
+	}
+	PrintToScreen(Message, Color);
+}
+#pragma endregion
