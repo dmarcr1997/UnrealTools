@@ -3,6 +3,7 @@
 
 #include "MyAssetActionUtility.h"
 #include "EditorUtilityLibrary.h"
+#include "EditorAssetLibrary.h"
 #include "Engine/Texture.h"
 
 #pragma region RenameSelectedAssets
@@ -108,6 +109,37 @@ void UMyAssetActionUtility::AddPrefixes()
 	GiveFeedback("Added Prefix to", Counter);
 }
 
+
+
+#pragma endregion
+#pragma region CleanUpFolder
+void UMyAssetActionUtility::CleanupFolder(FString ParentFolder)
+{
+	//Check if parent folder in content folder
+	if (!ParentFolder.StartsWith(TEXT("/Game")))
+	{
+		ParentFolder = FPaths::Combine(TEXT("/Game"), ParentFolder);
+	}
+	TArray<UObject*> SelectedObjects = UEditorUtilityLibrary::GetSelectedAssets();
+	uint32 Counter = 0;
+
+	for (UObject* SelectedObject : SelectedObjects)
+	{
+		if (ensure(SelectedObject))
+		{
+			FString NewPath = FPaths::Combine(ParentFolder, SelectedObject->GetClass()->GetName(), SelectedObject->GetName());
+			if (UEditorAssetLibrary::RenameLoadedAsset(SelectedObject, NewPath))
+			{
+				++Counter;
+			}
+			else {
+				PrintToScreen("Couldn't move " + SelectedObject->GetPathName(), FColor::Red);
+			}
+		}
+	}
+	GiveFeedback("Moved", Counter);
+
+}
 #pragma endregion
 #pragma region Helper
 
