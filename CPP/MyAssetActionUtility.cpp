@@ -141,6 +141,34 @@ void UMyAssetActionUtility::CleanupFolder(FString ParentFolder)
 
 }
 #pragma endregion
+#pragma region DuplicateAssets
+void UMyAssetActionUtility::DuplicateAsset(uint32 NumberOfDuplicates, bool bSave)
+{
+	TArray<FAssetData> AssetDataArray = UEditorUtilityLibrary::GetSelectedAssetData();
+	uint32 Counter = 0;
+
+	for (FAssetData AssetData : AssetDataArray) 
+	{
+		for (uint32 i = 0; i < NumberOfDuplicates; i++)
+		{
+			FString NewFilename = AssetData.AssetName.ToString().AppendChar('_').Append(FString::FromInt(i));
+			FString NewPath = FPaths::Combine(AssetData.PackagePath.ToString(), NewFilename);
+			if (ensure(UEditorAssetLibrary::DuplicateAsset(AssetData.ObjectPath.ToString(), NewPath)))
+			{
+				++Counter;
+				if (bSave)
+				{
+					UEditorUtilityLibrary::SaveAsset(NewPath, false);
+				}
+			}
+			{
+
+			}
+		}
+	}
+	GiveFeedback("Duplicated", Counter);
+}
+#pragma endregion
 #pragma region Helper
 
 bool UMyAssetActionUtility::IsPowerOfTwo(int32 NumberToCheck)

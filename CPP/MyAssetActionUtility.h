@@ -1,4 +1,8 @@
 
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
 #include "CoreMinimal.h"
 #include "AssetActionUtility.h"
 
@@ -40,6 +44,8 @@ public:
 		void AddPrefixes();
 	UFUNCTION(CallInEditor)
 		void CleanupFolder(FString ParentFolder = FString("/Game"));
+	UFUNCTION(CallInEditor)
+		void DuplicateAsset(uint32 NumberOfDuplicates = 1, bool bSave = true);
 private:
 
 	const TMap<UClass*, FString> PrefixMap = {
